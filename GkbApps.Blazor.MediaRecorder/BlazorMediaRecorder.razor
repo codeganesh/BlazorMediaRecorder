@@ -1,0 +1,660 @@
+﻿@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div class="blazor-media-recorder" style="width:@PreviewWidth;
+                                          height:@PreviewHeight;">
+    <div style="background-color:@PreviewBackColor;
+            width:@PreviewWidth;
+            height:@PreviewHeight;
+            border:@PreviewBorderWidth @PreviewBorderStyle @PreviewBorderColor;
+            border-radius:@PreviewBorderRadius;
+            aspect-ratio:16/9;
+            position:relative;
+            display:flex;
+            flex-direction:column;
+            align-items:center;"
+          @attributes="@PreviewAttributes">
+        <video @ref="videoElement"
+               style="width:100%;
+                  height:100%"
+               autoplay muted>
+        </video>
+        @if (ShowToolbar)
+        {
+            <div class="toolbar" style="background-color:@ToolbarBackColor;
+                                @(ToolbarPosition==ToolbarPosition.Bottom?"bottom:0;":"top:0;")">
+                @if (recordStatus == RecordStatus.SharingNotStarted)
+                {
+                    if (ShareButton is not null)
+                    {
+                        <div @onclick="ShareAsync">
+                            @ShareButton
+                        </div>
+                    }
+                    else
+                    {
+                        <button @onclick="ShareAsync"
+                                class="app-button app-button-share">
+                            Share
+                        </button>
+                    }
+                }
+                else if (recordStatus == RecordStatus.NotRecording)
+                {
+                    if (RecordButton is not null)
+                    {
+                        <div @onclick="RecordAsync">
+                            @RecordButton
+                        </div>
+                    }
+                    else
+                    {
+                        <button @onclick="RecordAsync"
+                                class="app-button app-button-record">
+                            Record
+                        </button>
+                    }
+                }
+                else if (recordStatus == RecordStatus.Recording)
+                {
+                    <div class="recording">
+                        <div>
+                            @if (!isPaused)
+                            {
+                                if (PauseButton is not null)
+                                {
+                                    <div @onclick="PauseAsync" class="margin-right-3">
+                                        @PauseButton
+                                    </div>
+                                }
+                                else
+                                {
+                                    <button @onclick="PauseAsync"
+                                            class="app-button app-button-pause margin-right-3">
+                                        Pause
+                                    </button>
+                                }
+                            }
+                            else
+                            {
+                                if (ResumeButton is not null)
+                                {
+                                    <div @onclick="ResumeAsync" class="margin-right-3">
+                                        @ResumeButton
+                                    </div>
+                                }
+                                else
+                                {
+                                    <button @onclick="ResumeAsync"
+                                            class="app-button app-button-resume margin-right-3">
+                                        Resume
+                                    </button>
+                                }
+                            }
+
+                        </div>
+                        <div>
+                            @if (StopButton is not null)
+                            {
+                                <div @onclick="StopAsync">
+                                    @StopButton
+                                </div>
+                            }
+                            else
+                            {
+                                <button @onclick="StopAsync"
+                                        class="app-button app-button-stop">
+                                    Stop
+                                </button>
+                            }
+
+                        </div>
+                    </div>
+                }
+                else if (recordStatus == RecordStatus.Stopped)
+                {
+                    <div class="recording-stopped">
+
+                        @if (DownloadButton is not null)
+                        {
+                            <a href="@mediaBlobUrl"
+                               download="@($"{DownloadFileName}.{fileExtension}")"
+                               class="margin-right-3">
+                                @DownloadButton
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="@mediaBlobUrl"
+                               download="@($"{DownloadFileName}.{fileExtension}")"
+                               class="app-button app-button-download margin-right-3">
+                                Download
+                            </a>
+                        }
+
+
+                        @if (RecordButton is not null)
+                        {
+                            <div @onclick="RecordAsync" class="margin-right-3">
+                                @RecordButton
+                            </div>
+                        }
+                        else
+                        {
+                            <button @onclick="RecordAsync"
+                                    class="app-button app-button-record margin-right-3">
+                                Record
+                            </button>
+                        }
+
+
+                        @if (RestartButton is not null)
+                        {
+                            <div @onclick="RestartAsync">
+                                @RestartButton
+                            </div>
+                        }
+                        else
+                        {
+                            <button @onclick="RestartAsync"
+                                    class="app-button app-button-restart">
+                                Restart
+                            </button>
+                        }
+
+                    </div>
+                }
+
+            </div>
+        }
+    </div>
+    @if (ShowErrorMessage && !string.IsNullOrEmpty(errorMessage))
+    {
+        <h4 class="error-message">@errorMessage</h4>
+    }
+</div>
+
+
+
+@code {
+    private IJSObjectReference? module, recorder;
+    private ElementReference videoElement;
+    private DotNetObjectReference<BlazorMediaRecorder>? dotNetHelper;
+    private RecordStatus recordStatus = RecordStatus.SharingNotStarted;
+    private string mediaBlobUrl = string.Empty;
+    private bool isPaused, audioDeviceChanged, videoDeviceChanged;
+    private string? audioDeviceId, videoDeviceId;
+    private string? errorMessage, fileExtension;
+
+
+    [Parameter]
+    public string PreviewWidth { get; set; } = "100%";
+    [Parameter]
+    public string PreviewHeight { get; set; } = "100%";
+
+    [Parameter]
+    public bool ShowToolbar { get; set; } = true;
+    [Parameter]
+    public string ToolbarBackColor { get; set; } = "rgba(205, 240, 201,0.50)";
+    [Parameter]
+    public ToolbarPosition ToolbarPosition { get; set; } = ToolbarPosition.Bottom;
+
+
+    [Parameter]
+    public string PreviewBackColor { get; set; } = "aliceblue";
+    [Parameter]
+    public string PreviewBorderWidth { get; set; } = "1px";
+    [Parameter]
+    public string PreviewBorderStyle { get; set; } = "solid";
+    [Parameter]
+    public string PreviewBorderColor { get; set; } = "#000";
+    [Parameter]
+    public string PreviewBorderRadius { get; set; } = "3px";
+    [Parameter(CaptureUnmatchedValues =true)]
+    public Dictionary<string,object>? PreviewAttributes { get; set; }
+
+    [Parameter]
+    public string DownloadFileName { get; set; } = "video";
+
+    [Parameter]
+    public bool ShowErrorMessage { get; set; } = true;
+
+    [Parameter]
+    public string? AudioDeviceId { get; set; }
+    [Parameter]
+    public string? VideoDeviceId { get; set; }
+
+    [Parameter]
+    public RecorderOptions Options { get; set; } = RecorderOptions.Screen;
+
+    [Parameter]
+    public RenderFragment? ShareButton { get; set; }
+
+    [Parameter]
+    public RenderFragment? RecordButton { get; set; }
+
+    [Parameter]
+    public RenderFragment? PauseButton { get; set; }
+
+    [Parameter]
+    public RenderFragment? ResumeButton { get; set; }
+
+    [Parameter]
+    public RenderFragment? StopButton { get; set; }
+
+    [Parameter]
+    public RenderFragment? DownloadButton { get; set; }
+
+    [Parameter]
+    public RenderFragment? RestartButton { get; set; }
+
+
+    [Parameter]
+    public EventCallback OnSharingStarted { get; set; }
+
+    [Parameter]
+    public EventCallback OnRecordingInitiated { get; set; }
+
+    [Parameter]
+    public EventCallback OnRecordingStarted { get; set; }
+
+    [Parameter]
+    public EventCallback OnRecordingPaused { get; set; }
+
+    [Parameter]
+    public EventCallback OnRecordingResumed { get; set; }
+
+    [Parameter]
+    public EventCallback<RecordingStoppedEventArgs> OnRecordingStopped { get; set; }
+
+    [Parameter]
+    public EventCallback OnTrackEnded { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnError { get; set; }
+
+
+    protected override void OnParametersSet()
+    {
+
+        if (!string.IsNullOrEmpty(AudioDeviceId))
+        {
+            if (audioDeviceId != AudioDeviceId && recordStatus == RecordStatus.NotRecording && (Options == RecorderOptions.MicAudio || Options == RecorderOptions.ScreenAndMicAudio || Options == RecorderOptions.CameraAndMicAudio))
+            {
+                audioDeviceChanged = true;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(VideoDeviceId))
+        {
+            if (videoDeviceId != VideoDeviceId && recordStatus == RecordStatus.NotRecording && (Options == RecorderOptions.Camera || Options == RecorderOptions.CameraAndMicAudio))
+            {
+                videoDeviceChanged = true;
+            }
+        }
+        audioDeviceId = AudioDeviceId;
+
+        videoDeviceId = VideoDeviceId;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            dotNetHelper = DotNetObjectReference.Create(this);
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/GkbApps.Blazor.MediaRecorder/BlazorMediaRecorder.razor.js");
+            await module.InvokeVoidAsync("assignDotNetHelper", videoElement, dotNetHelper);
+        }
+
+        if (audioDeviceChanged)
+        {
+            await AddMicAudioToVideoAsync();
+            audioDeviceChanged = false;
+        }
+
+        if (videoDeviceChanged)
+        {
+            await AddCameraToVideoAsync();
+            videoDeviceChanged = false;
+        }
+    }
+
+    private async Task ShareAsync()
+    {
+        switch (Options)
+        {
+            case RecorderOptions.Screen:
+                await ShareScreenAsync();
+                break;
+
+            case RecorderOptions.Camera:
+                await ShareCameraAsync();
+                break;
+
+            case RecorderOptions.MicAudio:
+                await ShareMicAudioAsync();
+                break;
+
+            case RecorderOptions.ScreenAndMicAudio:
+                await ShareScreenAsync(micAudio: true);
+                break;
+
+            case RecorderOptions.CameraAndMicAudio:
+                await ShareCameraAsync(micAudio: true);
+                break;
+
+            default:
+                await ShareScreenAsync();
+                break;
+        }
+    }
+
+    public async Task ShareScreenAsync(bool micAudio = false)
+    {
+        if (recordStatus != RecordStatus.SharingNotStarted)
+        {
+            return;
+        }
+        errorMessage = string.Empty;
+
+        try
+        {
+            if (module is not null)
+            {
+                var constraints = BuildAndReturnConstraints(video: true, audio: true);
+                await module.InvokeVoidAsync("shareDisplayMedia", videoElement, constraints);
+
+                if (micAudio)
+                {
+                    await AddMicAudioToVideoAsync();
+                }
+                recordStatus = RecordStatus.NotRecording;
+                await OnSharingStarted.InvokeAsync();
+            }
+        }
+        catch (JSException ex)
+        {
+            errorMessage = ex.Message;
+            recordStatus = RecordStatus.SharingNotStarted;
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    private async Task AddMicAudioToVideoAsync()
+    {
+        errorMessage = string.Empty;
+
+        if (module is not null)
+        {
+            var constraints = BuildAndReturnConstraints(video: false, audio: true, audioDeviceId: audioDeviceId);
+            await module.InvokeVoidAsync("addAudioTrack", videoElement, constraints);
+        }
+
+    }
+
+    private async Task AddCameraToVideoAsync()
+    {
+        errorMessage = string.Empty;
+
+        try
+        {
+            if (module is not null)
+            {
+                var constraints = BuildAndReturnConstraints(video: true, audio: false, videoDeviceId: videoDeviceId);
+                await module.InvokeVoidAsync("addVideoTrack", videoElement, constraints);
+            }
+        }
+        catch (JSException ex)
+        {
+            errorMessage = ex.Message;
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    public async Task ShareCameraAsync(bool micAudio = false)
+    {
+        if (recordStatus != RecordStatus.SharingNotStarted)
+        {
+            return;
+        }
+        errorMessage = string.Empty;
+
+        try
+        {
+            if (module is not null)
+            {
+
+                var constraints = BuildAndReturnConstraints(video: true, audio: micAudio);
+
+                await module.InvokeVoidAsync("shareUserMedia", videoElement, constraints);
+
+                recordStatus = RecordStatus.NotRecording;
+                await OnSharingStarted.InvokeAsync();
+            }
+        }
+        catch (JSException ex)
+        {
+            errorMessage = ex.Message;
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    public async Task ShareMicAudioAsync()
+    {
+        if (recordStatus != RecordStatus.SharingNotStarted)
+        {
+            return;
+        }
+        errorMessage = string.Empty;
+
+        try
+        {
+            if (module is not null)
+            {
+                var constraints = BuildAndReturnConstraints(video: false, audio: true);
+                await module.InvokeVoidAsync("shareUserMedia", videoElement, constraints);
+            }
+            recordStatus = RecordStatus.NotRecording;
+            await OnSharingStarted.InvokeAsync();
+        }
+        catch (JSException ex)
+        {
+            errorMessage = ex.Message;
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+
+    private object BuildAndReturnConstraints(bool video = true, bool audio = false, string? videoDeviceId = null, string? audioDeviceId = null)
+    {
+
+        var constraints = new
+        {
+            Video = video ? new
+            {
+                Width = new
+                {
+                    Ideal = 1920,
+                    Max = 7680
+                },
+                Height = new
+                {
+                    Ideal = 1080,
+                    Max = 4320
+                },
+                AspectRatio = 1.7777777778,
+                DeviceId = videoDeviceId ?? default
+            } : (object)false,
+            Audio = audio ? new
+            {
+                EchoCancellation = false,
+                NoiseSuppression = false,
+                DeviceId = audioDeviceId ?? default
+            } : (object)false,
+        };
+
+        return constraints;
+    }
+
+
+
+    public async Task RecordAsync()
+    {
+        if (recordStatus == RecordStatus.Recording)
+        {
+            return;
+        }
+        try
+        {
+            isPaused = false;
+
+            if (recordStatus == RecordStatus.SharingNotStarted)
+            {
+                await ShareAsync();
+            }
+
+            if (module is not null)
+            {
+                recorder = await module.InvokeAsync<IJSObjectReference>("getRecorder", videoElement);
+
+                if (recorder is not null)
+                {
+                    await OnRecordingInitiated.InvokeAsync();
+                    await recorder.InvokeVoidAsync("start");
+                    recordStatus = RecordStatus.Recording;
+                    await OnRecordingStarted.InvokeAsync();
+                }
+
+
+            }
+        }
+        catch (JSException ex)
+        {
+            errorMessage = ex.Message;
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    public async Task PauseAsync()
+    {
+
+        if (recordStatus != RecordStatus.Recording || isPaused)
+        {
+            return;
+        }
+
+        if (recorder is not null)
+        {
+            await recorder.InvokeVoidAsync("pause");
+            isPaused = true;
+            await OnRecordingPaused.InvokeAsync();
+
+        }
+    }
+
+    public async Task ResumeAsync()
+    {
+        if (recordStatus != RecordStatus.Recording || !isPaused)
+        {
+            return;
+        }
+
+        if (recorder is not null)
+        {
+            await recorder.InvokeVoidAsync("resume");
+            isPaused = false;
+            await OnRecordingResumed.InvokeAsync();
+        }
+    }
+
+    public async Task StopAsync()
+    {
+        try
+        {
+            if (recordStatus != RecordStatus.Recording)
+            {
+                return;
+            }
+
+            if (recorder is not null)
+            {
+                await recorder.InvokeVoidAsync("stop");
+                recordStatus = RecordStatus.Stopped;
+            }
+        }
+        catch (JSException ex)
+        {
+            errorMessage = ex.Message;
+            await OnError.InvokeAsync(ex.Message);
+        }
+    }
+
+    private async Task RestartAsync()
+    {
+        errorMessage = string.Empty;
+        await StartOver();
+        recordStatus = RecordStatus.SharingNotStarted;
+    }
+
+    [JSInvokable]
+    public async Task TrackEnded()
+    {
+        errorMessage = "Track Ended";
+        await StartOver();
+        recordStatus = RecordStatus.SharingNotStarted;
+        StateHasChanged();
+        await OnTrackEnded.InvokeAsync();
+    }
+
+    async Task StartOver()
+    {
+        if (!string.IsNullOrEmpty(mediaBlobUrl))
+        {
+            await JS.InvokeVoidAsync("URL.revokeObjectURL", mediaBlobUrl);
+        }
+        if (module is not null)
+        {
+            await module.InvokeVoidAsync("stopTracks", videoElement);
+        }
+
+        if (recorder is not null)
+        {
+            await recorder.DisposeAsync();
+        }
+    }
+
+
+    [JSInvokable]
+    public async Task RecordingStopped(string mediaBlobUrl, string fileExtension)
+    {
+        this.mediaBlobUrl = mediaBlobUrl;
+        this.fileExtension = fileExtension;
+
+        StateHasChanged();
+        await OnRecordingStopped.InvokeAsync(new RecordingStoppedEventArgs
+            {
+                MediaBlobUrl = mediaBlobUrl,
+                FileExtension = fileExtension
+            });
+    }
+
+
+    public async ValueTask DisposeAsync()
+    {
+        if (dotNetHelper is not null)
+        {
+            dotNetHelper.Dispose();
+        }
+
+        if (recorder is not null)
+        {
+            await recorder.DisposeAsync();
+        }
+
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+
+}

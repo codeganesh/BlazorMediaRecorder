@@ -1,0 +1,73 @@
+﻿.blazor-media-recorder{
+    display:flex;
+    flex-direction:column;
+}
+.toolbar {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.recording,.recording-stopped{
+    display:flex;
+    flex-direction:row;
+    justify-content:center;
+}
+
+.margin-right-3{
+    margin-right:1rem;
+}
+
+.app-button {
+    color: #fff;
+    cursor: pointer;
+    text-decoration:none;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    padding: .5rem .975rem;
+    font-size: 1rem;
+    border-radius: .25rem;
+}
+
+
+.app-button-share {
+    background-color: #227565;
+}
+
+.app-button-record, .app-button-stop {
+    background-color: #ed0800;
+}
+
+.app-button-pause {
+    background-color: #b37114;
+}
+
+.app-button-resume {
+    background-color: #0450e7;
+}
+
+.app-button-download {
+    background-color: #257867;
+}
+
+.app-button-restart {
+    background-color: #0450e7;
+}
+
+
+.error-message {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-self: center;
+    border-radius: 1rem;
+    background-color: #b03838;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    color: #fff;
+}

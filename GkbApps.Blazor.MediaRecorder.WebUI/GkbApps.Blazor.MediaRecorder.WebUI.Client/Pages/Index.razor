@@ -1,0 +1,54 @@
+﻿@page "/"
+@using GkbApps.Blazor.MediaRecorder.Models
+@rendermode InteractiveWebAssembly
+@inject IMediaDevicesEnumerator DevicesEnumerator
+
+
+
+<BlazorMediaRecorder Options="RecorderOptions.CameraAndMicAudio"
+                     AudioDeviceId="@audioDeviceId"
+                     Width="800px"
+                     BackColor="aliceblue"
+                     OnSharingStarted="LoadDevices"
+                     OnSharingBlocked="HandleCancelled"
+                     OnRecordingStarted="()=>{showDevices = false;}">
+</BlazorMediaRecorder>
+
+<h2>@errorMessage</h2>
+
+@if (showDevices)
+{
+    <InputSelect @bind-Value="audioDeviceId" class="form-control shadow-none">
+        @foreach (var device in audioDevices)
+        {
+            <option value="@device.DeviceId">@device.Label</option>
+        }
+    </InputSelect>
+}
+
+
+@code {
+
+
+    private List<MediaDeviceInfo> audioDevices = new();
+
+
+    private string? audioDeviceId,errorMessage;
+
+    private bool showDevices;
+
+
+
+    private async Task LoadDevices()
+    {
+        audioDevices = await DevicesEnumerator.EnumerateAudioDevicesAsync();
+        showDevices = true;
+    }
+
+
+    private void HandleCancelled()
+    {
+        errorMessage = "Cancelled";
+    }
+
+}

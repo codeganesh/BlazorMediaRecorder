@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34205.153
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GkbApps.Blazor.MediaRecorder", "GkbApps.Blazor.MediaRecorder\GkbApps.Blazor.MediaRecorder.csproj", "{E2F4C9C4-1567-4B0F-8431-C7D39F7E637F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GkbApps.Blazor.MediaRecorder.Demo", "GkbApps.Blazor.MediaRecorder.Demo\GkbApps.Blazor.MediaRecorder.Demo.csproj", "{5FF3D2E9-F188-4174-83CB-F3ED60AFBFBC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0A6BAAFB-B4B5-4CEA-98C5-72E26DF28D9E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{3115CE2A-896B-4914-B605-6472F8BBA961}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E2F4C9C4-1567-4B0F-8431-C7D39F7E637F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2F4C9C4-1567-4B0F-8431-C7D39F7E637F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2F4C9C4-1567-4B0F-8431-C7D39F7E637F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2F4C9C4-1567-4B0F-8431-C7D39F7E637F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FF3D2E9-F188-4174-83CB-F3ED60AFBFBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FF3D2E9-F188-4174-83CB-F3ED60AFBFBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FF3D2E9-F188-4174-83CB-F3ED60AFBFBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FF3D2E9-F188-4174-83CB-F3ED60AFBFBC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E2F4C9C4-1567-4B0F-8431-C7D39F7E637F} = {0A6BAAFB-B4B5-4CEA-98C5-72E26DF28D9E}
+		{5FF3D2E9-F188-4174-83CB-F3ED60AFBFBC} = {3115CE2A-896B-4914-B605-6472F8BBA961}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0034216D-6009-4564-9A27-67D6102C1C5B}
+	EndGlobalSection
+EndGlobal
