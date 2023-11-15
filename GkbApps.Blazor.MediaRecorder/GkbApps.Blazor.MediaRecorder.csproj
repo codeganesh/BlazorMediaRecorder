@@ -13,6 +13,7 @@
 	<PackageTags>blazor;blazor recorder;blazor media recorder;record screen in blazor;record camera in blazor;record mic audio in blazor;record mic in blazor;blazor record screen;blazor record camera;blazor record mic audio;blazor record mic;blazor screen recorder;blazor camera recorder;blazor mic audio recorder;blazor mic recorder;recorder component;.net record screen;C# record screen;record screen in .net;record screen in C#;.net record camera;C# record camera;record camera in .net;record camera in C#;.net record mic audio;C# record mic audio;record mic in .net;record mic in C#;.net record video;C# record video;record video in C#;record video in .net;.net record audio;C# record audio;record audio in C#;record audio in .net</PackageTags>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <PackageVersion>1.0.0</PackageVersion>
 
   </PropertyGroup>
 
