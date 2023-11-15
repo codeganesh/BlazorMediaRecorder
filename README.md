@@ -12,7 +12,6 @@ install-package GkbApps.Blazor.MediaRecorder
 
 ```
 @using GkbApps.Blazor.MediaRecorder.Enums
-@using GkbApps.Blazor.MediaRecorder.Models
 ```
 
 ## Usage
@@ -85,4 +84,3 @@ Then, apply the render mode to the wrapper component instance.
   <BlazorMediaRecorder Options="RecorderOptions.MicAudio">
     </BlazorMediaRecorder>
 ```
-
