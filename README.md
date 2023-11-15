@@ -8,7 +8,7 @@ A Razor component that lets us record screen, camera, and mic audio.
 install-package GkbApps.Blazor.MediaRecorder
 ```
 
-## Include the namespaces
+## Include the namespaces in _Imports.razor
 
 ```
 @using GkbApps.Blazor.MediaRecorder.Enums
