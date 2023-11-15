@@ -8,13 +8,14 @@ A Razor component that lets us record screen, camera, and mic audio.
 install-package GkbApps.Blazor.MediaRecorder
 ```
 
-## Include the namespaces in _Imports.razor
+## Include the following namespaces in _Imports.razor
 
 ```
+@using GkbApps.Blazor.MediaRecorder
 @using GkbApps.Blazor.MediaRecorder.Enums
 ```
 
-## Usage
+## Usage (.NET 8 and above)
 
 ### Apply a render mode to a component definition
 
@@ -40,13 +41,17 @@ At the top of the page/component where you are using BlazorMediaRecorder, specif
 
 ### Alternatively, apply a render mode to a component instance
 
-To do that, create a wrapper component and put the BlazorMediaRecorder component inside it.
-Then, apply the render mode to the wrapper component instance.
+The following example sets the component's render mode to InteractiveServer. In a similar manner, you can set the render mode to InteractiveWebAssembly or InteractiveAuto. Just make sure that the component is present in the Client project for the InteractiveWebAssembly and InteractiveAuto render modes.
 
 ```
-  <BlazorMediaRecorderWrapper @rendermode="InteractiveServer">
-    </BlazorMediaRecorderWrapper>
+  <BlazorMediaRecorder @rendermode="InteractiveServer"
+                       Options="RecorderOptions.ScreenAndMicAudio">
+    </BlazorMediaRecorder>
 ```
+
+## Usage (.NET 7 and earlier versions)
+
+Simply use the component and pass any parameters (see below).
 
 ### Record media
 
