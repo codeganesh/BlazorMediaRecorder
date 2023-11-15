@@ -7,10 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GkbApps.Blazor.MediaRecorde
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GkbApps.Blazor.MediaRecorder.Demo", "GkbApps.Blazor.MediaRecorder.Demo\GkbApps.Blazor.MediaRecorder.Demo.csproj", "{5FF3D2E9-F188-4174-83CB-F3ED60AFBFBC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0A6BAAFB-B4B5-4CEA-98C5-72E26DF28D9E}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{3115CE2A-896B-4914-B605-6472F8BBA961}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,10 +24,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{E2F4C9C4-1567-4B0F-8431-C7D39F7E637F} = {0A6BAAFB-B4B5-4CEA-98C5-72E26DF28D9E}
-		{5FF3D2E9-F188-4174-83CB-F3ED60AFBFBC} = {3115CE2A-896B-4914-B605-6472F8BBA961}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0034216D-6009-4564-9A27-67D6102C1C5B}
