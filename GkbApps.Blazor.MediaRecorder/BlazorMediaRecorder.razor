@@ -470,27 +470,20 @@
 
         var constraints = new
         {
-            Video = video ? new
-            {
-                Width = new
-                {
-                    Ideal = 1920,
-                    Max = 7680
-                },
-                Height = new
-                {
-                    Ideal = 1080,
-                    Max = 4320
-                },
-                AspectRatio = 1.7777777778,
-                DeviceId = videoDeviceId ?? default
-            } : (object)false,
             Audio = audio ? new
             {
                 EchoCancellation = false,
                 NoiseSuppression = false,
                 DeviceId = audioDeviceId ?? default
             } : (object)false,
+            Video = video ? new
+            {
+                Width = new { Ideal = 7680 },
+                Height = new { Ideal = 4320 },
+                DeviceId = videoDeviceId ?? default
+
+            } : (object)false
+            
         };
 
         return constraints;

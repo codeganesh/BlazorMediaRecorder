@@ -6,14 +6,14 @@
 	<ImplicitUsings>enable</ImplicitUsings>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	<PackageId>GkbApps.Blazor.MediaRecorder</PackageId>
-	<Title>Blazor Media Recorder</Title>
+	  <Title>Blazor Media Recorder</Title>
 	<Authors>codeganesh</Authors>
 	<Description>Component for recording screen, camera and mic audio</Description>
-	<PackageIcon>BlazorMediaRecorder.png</PackageIcon>
 	<PackageTags>blazor;blazor recorder;blazor media recorder;record screen in blazor;record camera in blazor;record mic audio in blazor;record mic in blazor;blazor record screen;blazor record camera;blazor record mic audio;blazor record mic;blazor screen recorder;blazor camera recorder;blazor mic audio recorder;blazor mic recorder;recorder component;.net record screen;C# record screen;record screen in .net;record screen in C#;.net record camera;C# record camera;record camera in .net;record camera in C#;.net record mic audio;C# record mic audio;record mic in .net;record mic in C#;.net record video;C# record video;record video in C#;record video in .net;.net record audio;C# record audio;record audio in C#;record audio in .net</PackageTags>
 	  <PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
 	  <PackageVersion>1.0.0</PackageVersion>
+	  <PackageIcon>BlazorMediaRecorder.png</PackageIcon>
 
   </PropertyGroup>
 
@@ -25,18 +25,17 @@
 	<Folder Include="wwwroot\" />
   </ItemGroup>
 
-  <ItemGroup>
-	<None Include="..\..\..\..\Users\codeg\OneDrive\Documents\BlazorMediaRecorder.png">
-	  <Pack>True</Pack>
-	  <PackagePath>\</PackagePath>
-	</None>
-  </ItemGroup>
+
 
   <ItemGroup>
 	<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+	<None Update="BlazorMediaRecorder.png">
+	  <Pack>True</Pack>
+	  <PackagePath>\</PackagePath>
+	</None>
 	<None Update="README.md">
 	  <Pack>True</Pack>
 	  <PackagePath>\</PackagePath>

@@ -2,16 +2,22 @@
 @inject MediaDevicesEnumerator DevicesEnumerator
 
 <div class="w-75">
-    <BlazorMediaRecorder Options="RecorderOptions.ScreenAndMicAudio"
-                         AudioDeviceId="@audioDeviceId"
-                         OnSharingStarted="LoadDevices"
-                         OnRecordingStopped="HideDevices">
+    <BlazorMediaRecorder 
+        AudioDeviceId="@audioDeviceId"
+        VideoDeviceId="@videoDeviceId"
+        OnSharingStarted="LoadDevices"
+        Options="RecorderOptions.CameraAndMicAudio">
     </BlazorMediaRecorder>
-
     @if (showDevices)
     {
         <InputSelect @bind-Value="audioDeviceId" class="form-control shadow-none mt-3">
             @foreach (var device in audioDevices)
+            {
+                <option value="@device.DeviceId">@device.Label</option>
+            }
+        </InputSelect>
+        <InputSelect @bind-Value="videoDeviceId" class="form-control shadow-none mt-3">
+            @foreach (var device in videoDevices)
             {
                 <option value="@device.DeviceId">@device.Label</option>
             }
@@ -24,17 +30,22 @@
 
     private List<MediaDeviceInfo> audioDevices = new();
     private string? audioDeviceId;
+    private string? videoDeviceId;
+    private List<MediaDeviceInfo> videoDevices = new();
+
     private bool showDevices;
 
     private async Task LoadDevices()
     {
         audioDevices = await DevicesEnumerator.EnumerateAudioDevicesAsync();
+        videoDevices = await DevicesEnumerator.EnumerateVideoDevicesAsync();
         showDevices = true;
     }
 
     private void HideDevices()
     {
         audioDeviceId = null;
+        videoDeviceId = null;
         showDevices = false;
     }
 }
